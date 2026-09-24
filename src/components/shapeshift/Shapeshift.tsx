@@ -2,6 +2,12 @@
 
 import { AnimatePresence, motion, MotionConfig, useReducedMotion, useSpring } from "motion/react";
 import { useEffect, useMemo, useRef, useState, useSyncExternalStore } from "react";
+import dynamic from "next/dynamic";
+
+const Shrivardhan3DTitle = dynamic(
+  () => import("@/components/three/Shrivardhan3DTitle").then((m) => m.Shrivardhan3DTitle),
+  { ssr: false }
+);
 import { registry } from "@/components/intents/registry";
 import { useDemoScript } from "@/hooks/useDemoScript";
 import { useIntent } from "@/hooks/useIntent";
@@ -287,10 +293,10 @@ export function Shapeshift() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <main id="main" className="mx-auto w-full max-w-[560px] px-4 pt-[10vh] pb-24 sm:px-0 sm:pt-[14vh]">
-        {/* 3D Header Anchor - Positioned right above the input container */}
-        <div id="shrivardhan-anchor" className="mb-5 sm:mb-7 flex h-14 sm:h-18 w-full items-center justify-center">
-          <span className="sr-only">Shrivardhan</span>
+      <main id="main" className="mx-auto w-full max-w-[560px] px-4 pt-6 sm:pt-14 pb-24">
+        {/* 3D Bold Colorful Shrivardhan Title - Always directly above the input container */}
+        <div className="mb-2 sm:mb-4 w-full flex items-center justify-center">
+          <Shrivardhan3DTitle />
         </div>
         <h1 className="sr-only">Shapeshift</h1>
         <MorphContainer readiness={readiness} edge={ghost ? null : (meta?.edge ?? null)}>
