@@ -20,6 +20,8 @@ export const INTENT_KEYS = [
   "timezone",
   "random",
   "goal",
+  "password",
+  "json",
   "note",
   "none",
 ] as const;

@@ -18,6 +18,8 @@ import { completeCountdown, parseCountdown, type CountdownData } from "./countdo
 import { completeTimezone, parseTimezone, type TimezoneData } from "./timezone";
 import { completeRandom, parseRandom, type RandomData } from "./random";
 import { completeGoal, parseGoal, type GoalData } from "./goal";
+import { completePassword, parsePassword, type PasswordData } from "./password";
+import { completeJson, parseJson, type JsonData } from "./json";
 import { completeGmail, parseGmail, type GmailData } from "@/components/intents/GmailCard";
 
 export type ParsedMap = {
@@ -40,6 +42,8 @@ export type ParsedMap = {
   timezone: TimezoneData;
   random: RandomData;
   goal: GoalData;
+  password: PasswordData;
+  json: JsonData;
   note: NoteData;
 };
 
@@ -70,6 +74,8 @@ export const parsers: { [K in CardIntent]: Parser<K> } = {
   timezone: { parse: (t, c) => parseTimezone(t, c.ref), complete: completeTimezone },
   random: { parse: (t) => parseRandom(t), complete: completeRandom },
   goal: { parse: (t) => parseGoal(t), complete: completeGoal },
+  password: { parse: (t) => parsePassword(t), complete: completePassword },
+  json: { parse: (t) => parseJson(t), complete: completeJson },
   note: { parse: (t) => parseNote(t), complete: completeNote },
 };
 

@@ -19,7 +19,7 @@ import {
 } from "./types";
 
 /** Keep in sync with questions.ts (asserted in tests). */
-export const MOCK_QUESTION_COUNT = 15;
+export const MOCK_QUESTION_COUNT = 17;
 export const MOCK_MODEL = "jev-offline";
 
 const has = (re: RegExp, t: string) => re.test(t);
@@ -95,6 +95,15 @@ function intentScores(raw: string): Scores {
   if (has(/\b\d[\d,]*\s*(of|\/|out of)\s*\d[\d,]*\b/, t) && has(/[a-z]{3,}/, t)) add("goal", 4.5);
   if (has(/\b(goal|target)\b/, t)) add("goal", 3);
   if (has(/\b(done|so far|saved|completed|finished)\b/, t) && has(/\d/, t)) add("goal", (t.match(/\d+/g)?.length ?? 0) >= 2 ? 5 : 2.5);
+  // Password / keygen
+  if (has(/\b(password|passwd|passphrase|pin|otp)\b/, t)) add("password", 6.5);
+  if (has(/\b(generate|create|make|new)\s+(a\s+)?(strong\s+|random\s+|secure\s+)?(password|passwd|passphrase|pin|key|token)\b/, t)) add("password", 7);
+  if (has(/\b(api\s*key|secret\s*key|access\s*token)\b/, t)) add("password", 5);
+  // JSON formatting
+  if (has(/^\s*[\[{]/, t) && has(/[\]}]\s*$/, t)) add("json", 7);
+  if (has(/\b(format|prettify|beautify|validate|parse|lint|minify|pretty\s*print)\s+(json|the json|\{)\b/, t)) add("json", 7);
+  if (has(/\bjson\b/, t) && has(/\b(format|prettify|validate|parse|beautify)\b/, t)) add("json", 6);
+  if (has(/\bjson\b/, t) && has(/[\[{]/, t)) add("json", 5);
   const listSeps = (t.match(/,|\band\b|&|\n/g) ?? []).length;
   if (listSeps >= 2) add("todo", 4);
   else if (listSeps === 1 && has(/^(buy|get|todo|to do|groceries)\b/, t)) add("todo", 3);
@@ -139,6 +148,8 @@ function intentScores(raw: string): Scores {
     s.convert = Math.min(s.convert ?? 0, 1);
   }
   if ((s.goal ?? 0) >= 4.5) s.calc = Math.min(s.calc ?? 0, 1);
+  if ((s.password ?? 0) >= 6) { s.random = Math.min(s.random ?? 0, 2); s.note = Math.min(s.note ?? 0, 1); }
+  if ((s.json ?? 0) >= 6) { s.note = Math.min(s.note ?? 0, 1); s.todo = Math.min(s.todo ?? 0, 1); }
   return s;
 }
 

@@ -30,6 +30,8 @@ export const questions = {
     timezone: "Converting a time of day between time zones or cities, or asking the time somewhere",
     random: "Asking for a random result: rolling dice, flipping a coin, a random number or letting chance pick",
     goal: "Tracking progress toward a numeric target, such as 4 of 12 books read or money saved",
+    password: "Generating a password, PIN, API key, token or random secure string",
+    json: "Formatting, prettifying, validating or parsing JSON data",
     note: "Writing a thought, idea or note that is none of the above",
     none: "Too short, unclear or unfinished to tell yet",
   }),

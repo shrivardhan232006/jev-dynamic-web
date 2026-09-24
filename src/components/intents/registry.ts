@@ -2,7 +2,9 @@ import {
   AlarmClock,
   CalendarClock,
   Dices,
+  FileJson,
   Globe,
+  KeyRound,
   Target,
   Bell,
   Briefcase,
@@ -39,6 +41,8 @@ import { CountdownCard } from "./CountdownCard";
 import { GoalCard } from "./GoalCard";
 import { RandomCard } from "./RandomCard";
 import { TimezoneCard } from "./TimezoneCard";
+import { PasswordCard } from "./PasswordCard";
+import { JsonCard } from "./JsonCard";
 import { ColorPicker } from "./ColorPicker";
 import { ContactCard } from "./ContactCard";
 import { ConvertCard } from "./ConvertCard";
@@ -257,6 +261,22 @@ export const registry: Registry = {
     signals: [],
     summary: (d) => (d.target ? `${d.title || "Goal"} · ${d.current}/${d.target}${d.unit ? ` ${d.unit}` : ""}` : d.title || "Goal"),
     Component: GoalCard,
+  },
+  password: {
+    label: "Password",
+    example: "generate a strong password 20 chars",
+    icon: KeyRound,
+    signals: [],
+    summary: (d) => `${d.label} · ${d.length} chars`,
+    Component: PasswordCard,
+  },
+  json: {
+    label: "JSON",
+    example: "format json {\"name\": \"jev\"}",
+    icon: FileJson,
+    signals: [],
+    summary: (d) => d.formatted ? `${d.keyCount} keys · ${d.lineCount} lines` : d.error ?? "JSON",
+    Component: JsonCard,
   },
   note: {
     label: "Note",
