@@ -84,7 +84,7 @@ const TONE_EDGE = {
 export const registry: Registry = {
   event: {
     label: "Event",
-    example: "dinner with priya friday 8pm",
+    example: "team standup tomorrow 10am on meet",
     icon: CalendarDays,
     signals: ["eventMode", "recurring"],
     badges: repeats,
@@ -93,7 +93,7 @@ export const registry: Registry = {
   },
   reminder: {
     label: "Reminder",
-    example: "remind me to call mom tomorrow",
+    example: "remind me to push the deployment at 6pm",
     icon: Bell,
     signals: ["urgency", "recurring"],
     badges: (s) => [...urgent(s), ...repeats(s)],
@@ -103,7 +103,7 @@ export const registry: Registry = {
   },
   todo: {
     label: "Checklist",
-    example: "buy milk, eggs, bread and coffee",
+    example: "eggs, avocados, oat milk and sriracha",
     icon: ListChecks,
     signals: ["isShoppingList", "urgency"],
     headerIcon: (s) => (s.isShoppingList ? ShoppingCart : ListChecks),
@@ -114,7 +114,7 @@ export const registry: Registry = {
   },
   timer: {
     label: "Timer",
-    example: "25 min focus",
+    example: "45 min deep work session",
     icon: Timer,
     signals: ["timerKind"],
     headerIcon: (s) => (s.timerKind === "focus" ? Focus : s.timerKind === "break" ? Coffee : s.timerKind === "stopwatch" ? AlarmClock : Timer),
@@ -124,7 +124,7 @@ export const registry: Registry = {
   },
   habit: {
     label: "Habit",
-    example: "meditate every morning",
+    example: "workout 5x a week",
     icon: Sun,
     signals: [],
     summary: (d) => [d.title || "Habit", d.label].filter(Boolean).join(" · "),
@@ -132,7 +132,7 @@ export const registry: Registry = {
   },
   color: {
     label: "Color",
-    example: "#ff6b35",
+    example: "cyberpunk neon pink",
     icon: Palette,
     signals: ["colorMood"],
     summary: (d) => [d.name ? d.name[0].toUpperCase() + d.name.slice(1) : "Color", d.hex?.toUpperCase()].filter(Boolean).join(" · "),
@@ -140,7 +140,7 @@ export const registry: Registry = {
   },
   split: {
     label: "Split",
-    example: "split 2400 between 3",
+    example: "split 3600 between 4",
     icon: Users,
     signals: [],
     summary: (d) =>
@@ -149,7 +149,7 @@ export const registry: Registry = {
   },
   expense: {
     label: "Expense",
-    example: "spent 450 on uber",
+    example: "spent 850 on flights",
     icon: Wallet,
     signals: ["expenseCategory"],
     headerIcon: (s) => (s.expenseCategory ? CATEGORY_ICON[s.expenseCategory] : Wallet),
@@ -158,7 +158,7 @@ export const registry: Registry = {
   },
   convert: {
     label: "Convert",
-    example: "5 miles in km",
+    example: "100 kg in pounds",
     icon: Ruler,
     signals: [],
     summary: (d) =>
@@ -169,7 +169,7 @@ export const registry: Registry = {
   },
   calc: {
     label: "Calculate",
-    example: "18% of 3450",
+    example: "22% tip on 2750",
     icon: Calculator,
     signals: [],
     summary: (d) => (d.result !== null ? `${d.expression} = ${d.result.toLocaleString("en-US")}` : d.expression),
@@ -177,7 +177,7 @@ export const registry: Registry = {
   },
   travel: {
     label: "Trip",
-    example: "flight to goa next weekend",
+    example: "train to mumbai next friday",
     icon: TRANSPORT_ICON.flight,
     signals: ["transport", "tripType"],
     headerIcon: (s) => TRANSPORT_ICON[s.transport ?? "unspecified"],
@@ -192,7 +192,7 @@ export const registry: Registry = {
   },
   poll: {
     label: "Poll",
-    example: "pizza or burgers for friday?",
+    example: "sushi or tacos tonight?",
     icon: Vote,
     signals: ["hasExplicitOptions"],
     summary: (d) => d.title || d.options.join(" / ") || "Poll",
@@ -200,7 +200,7 @@ export const registry: Registry = {
   },
   contact: {
     label: "Contact",
-    example: "rahul 98200 12345 rahul@mail.com",
+    example: "save 91-98765-43210 dev@startup.io",
     icon: Contact,
     signals: [],
     summary: (d) => [d.name || "Contact", d.phone ?? d.email].filter(Boolean).join(" · "),
@@ -226,7 +226,7 @@ export const registry: Registry = {
   },
   countdown: {
     label: "Countdown",
-    example: "days until christmas",
+    example: "days until new year",
     icon: CalendarClock,
     signals: [],
     summary: (d) =>
@@ -235,7 +235,7 @@ export const registry: Registry = {
   },
   timezone: {
     label: "Time zone",
-    example: "3pm pst in ist",
+    example: "9am tokyo in london",
     icon: Globe,
     signals: [],
     summary: (d) =>
@@ -244,7 +244,7 @@ export const registry: Registry = {
   },
   random: {
     label: "Random",
-    example: "roll 2d6",
+    example: "flip a coin",
     icon: Dices,
     signals: [],
     summary: (d) => describeRandom(d),
@@ -252,7 +252,7 @@ export const registry: Registry = {
   },
   goal: {
     label: "Goal",
-    example: "read 12 books this year, 4 done",
+    example: "read 24 books this year, 7 done",
     icon: Target,
     signals: [],
     summary: (d) => (d.target ? `${d.title || "Goal"} · ${d.current}/${d.target}${d.unit ? ` ${d.unit}` : ""}` : d.title || "Goal"),
@@ -260,7 +260,7 @@ export const registry: Registry = {
   },
   note: {
     label: "Note",
-    example: "the city felt so quiet this morning",
+    example: "the night sky looked unreal from the rooftop",
     icon: StickyNote,
     signals: ["tone", "isQuestion"],
     // The edge color is always paired with a tone word in the header, never color alone.

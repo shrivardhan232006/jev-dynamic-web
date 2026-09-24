@@ -1,6 +1,6 @@
 import { ImageResponse } from "next/og";
 
-export const alt = "Shapeshift: a text box morphing into an event card as you type";
+export const alt = "Jev Dynamic Web: a text box morphing into an event card as you type";
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
 
@@ -25,7 +25,7 @@ export default function OpengraphImage() {
           }}
         >
           <div style={{ fontSize: 38, color: ink, letterSpacing: -0.5, display: "flex" }}>
-            dinner with priya friday 8pm on zoom<span style={{ color: "#3b5bdb" }}>|</span>
+            team standup tomorrow 10am on meet<span style={{ color: "#3b5bdb" }}>|</span>
           </div>
           <div style={{ display: "flex", alignItems: "center", gap: 18 }}>
             <div style={{ width: 64, height: 64, borderRadius: 18, background: "#f4f4f2", display: "flex", alignItems: "center", justifyContent: "center" }}>
@@ -34,16 +34,16 @@ export default function OpengraphImage() {
             <div style={{ fontSize: 26, color: muted, display: "flex" }}>Event</div>
             <div style={{ marginLeft: "auto", fontSize: 22, color: muted, border: "2px solid #e8e7e4", borderRadius: 999, padding: "6px 16px", display: "flex" }}>Video call</div>
           </div>
-          <div style={{ fontSize: 34, fontWeight: 600, color: ink, display: "flex" }}>Dinner</div>
+          <div style={{ fontSize: 34, fontWeight: 600, color: ink, display: "flex" }}>Team Standup</div>
           <div style={{ display: "flex", gap: 14 }}>
-            {["Friday", "8 PM", "Priya"].map((c) => (
+            {["Tomorrow", "10 AM", "Google Meet"].map((c) => (
               <div key={c} style={{ fontSize: 24, color: "#57564f", background: "#f4f4f2", borderRadius: 999, padding: "8px 20px", display: "flex" }}>
                 {c}
               </div>
             ))}
           </div>
         </div>
-        <div style={{ fontSize: 30, color: muted, display: "flex" }}>Shapeshift: an input that becomes what you mean</div>
+        <div style={{ fontSize: 30, color: muted, display: "flex" }}>Jev Dynamic Web: an input that becomes what you mean</div>
       </div>
     ),
     size,
