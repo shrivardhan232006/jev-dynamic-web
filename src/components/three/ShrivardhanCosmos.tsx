@@ -5,58 +5,66 @@ import * as THREE from "three";
 import { FontLoader } from "three/examples/jsm/loaders/FontLoader.js";
 import { TextGeometry } from "three/examples/jsm/geometries/TextGeometry.js";
 
-interface ColorTheme {
-  name: string;
-  frontColor: number;
-  sideColor: number;
-  emissive: number;
-  particles: string[];
-  lights: [number, number, number];
-}
-
-const THEMES: ColorTheme[] = [
+// Vibrant color spectrum palettes
+const PALETTES = [
   {
-    name: "Cosmic Cyber",
-    frontColor: 0x38bdf8,
-    sideColor: 0x6366f1,
-    emissive: 0x1e1b4b,
-    particles: ["#38bdf8", "#818cf8", "#c084fc", "#f43f5e", "#34d399"],
-    lights: [0x38bdf8, 0xf43f5e, 0xa855f7],
+    name: "Prismatic Rainbow",
+    stops: [
+      "#ff1361", // Hot Rose
+      "#ff5e3a", // Orange Neon
+      "#ffb300", // Amber Gold
+      "#00e676", // Electric Green
+      "#00e5ff", // Bright Cyan
+      "#2979ff", // Electric Blue
+      "#7c4dff", // Deep Purple
+      "#d500f9", // Magenta Fuchsia
+      "#ff1744", // Crimson Rose
+    ],
+    lights: [0x00e5ff, 0xff1361, 0xffb300, 0x7c4dff],
   },
   {
-    name: "Prismatic Gold",
-    frontColor: 0xfbbf24,
-    sideColor: 0xf97316,
-    emissive: 0x451a03,
-    particles: ["#f59e0b", "#fb923c", "#ef4444", "#ec4899", "#8b5cf6"],
-    lights: [0xf59e0b, 0xec4899, 0x06b6d4],
+    name: "Cyber Neon",
+    stops: [
+      "#00f0ff", // Cyber Cyan
+      "#7000ff", // Electric Violet
+      "#ff007b", // Neon Pink
+      "#ffe600", // Acid Yellow
+      "#00ff66", // Cyber Lime
+    ],
+    lights: [0x00f0ff, 0xff007b, 0x7000ff, 0x00ff66],
   },
   {
-    name: "Electric Aurora",
-    frontColor: 0x34d399,
-    sideColor: 0x06b6d4,
-    emissive: 0x064e3b,
-    particles: ["#10b981", "#06b6d4", "#3b82f6", "#a855f7", "#ec4899"],
-    lights: [0x10b981, 0x06b6d4, 0x8b5cf6],
+    name: "Sunset Nebula",
+    stops: [
+      "#ff4b1f", // Sunset Red
+      "#ff9068", // Coral
+      "#fdbb2d", // Warm Gold
+      "#b224ef", // Deep Violet
+      "#7579ff", // Lavender Blue
+    ],
+    lights: [0xff4b1f, 0xfdbb2d, 0xb224ef, 0x7579ff],
   },
   {
-    name: "Neon Sunset",
-    frontColor: 0xf43f5e,
-    sideColor: 0x8b5cf6,
-    emissive: 0x3b0764,
-    particles: ["#f43f5e", "#ec4899", "#d946ef", "#8b5cf6", "#38bdf8"],
-    lights: [0xf43f5e, 0x8b5cf6, 0xfacc15],
+    name: "Emerald Aurora",
+    stops: [
+      "#0575e6", // Ocean Blue
+      "#00f260", // Bright Green
+      "#38ef7d", // Mint
+      "#11998e", // Teal
+      "#8e2de2", // Royal Purple
+    ],
+    lights: [0x00f260, 0x0575e6, 0x38ef7d, 0x8e2de2],
   },
 ];
 
 export function ShrivardhanCosmos() {
   const containerRef = useRef<HTMLDivElement>(null);
-  const [themeIdx, setThemeIdx] = useState(0);
-  const themeRef = useRef(THEMES[0]);
+  const [paletteIdx, setPaletteIdx] = useState(0);
+  const paletteRef = useRef(PALETTES[0]);
 
   useEffect(() => {
-    themeRef.current = THEMES[themeIdx];
-  }, [themeIdx]);
+    paletteRef.current = PALETTES[paletteIdx];
+  }, [paletteIdx]);
 
   useEffect(() => {
     const container = containerRef.current;
@@ -64,7 +72,6 @@ export function ShrivardhanCosmos() {
 
     // --- Scene Setup ---
     const scene = new THREE.Scene();
-    scene.fog = new THREE.FogExp2(0x0f172a, 0.0014);
 
     const camera = new THREE.PerspectiveCamera(
       45,
@@ -72,8 +79,8 @@ export function ShrivardhanCosmos() {
       0.1,
       1500
     );
-    // Position camera
-    camera.position.set(0, 5, 175);
+    camera.position.set(0, 0, 160);
+    camera.lookAt(0, 0, 0);
 
     const renderer = new THREE.WebGLRenderer({
       alpha: true,
@@ -86,146 +93,170 @@ export function ShrivardhanCosmos() {
     renderer.toneMappingExposure = 1.35;
     container.appendChild(renderer.domElement);
 
-    // --- Volumetric Lighting ---
-    const ambientLight = new THREE.AmbientLight(0xffffff, 0.9);
+    // --- Lighting ---
+    const ambientLight = new THREE.AmbientLight(0xffffff, 1.1);
     scene.add(ambientLight);
 
-    const dirLight = new THREE.DirectionalLight(0xffffff, 1.2);
-    dirLight.position.set(0, 80, 100);
+    const dirLight = new THREE.DirectionalLight(0xffffff, 1.4);
+    dirLight.position.set(0, 50, 100);
     scene.add(dirLight);
 
-    const pointLight1 = new THREE.PointLight(themeRef.current.lights[0], 4, 350);
-    pointLight1.position.set(90, 60, 60);
-    scene.add(pointLight1);
+    // 4 Orbiting colorful specular lights
+    const currentLights = paletteRef.current.lights;
+    const pLight1 = new THREE.PointLight(currentLights[0], 5, 250);
+    const pLight2 = new THREE.PointLight(currentLights[1], 5, 250);
+    const pLight3 = new THREE.PointLight(currentLights[2], 4, 250);
+    const pLight4 = new THREE.PointLight(currentLights[3], 4, 250);
+    scene.add(pLight1, pLight2, pLight3, pLight4);
 
-    const pointLight2 = new THREE.PointLight(themeRef.current.lights[1], 4, 350);
-    pointLight2.position.set(-90, -40, 60);
-    scene.add(pointLight2);
+    // --- Helper to sample color along palette stops ---
+    const samplePaletteColor = (t: number, palette: typeof PALETTES[0], target: THREE.Color) => {
+      const stops = palette.stops;
+      const count = stops.length;
+      const normT = ((t % 1) + 1) % 1;
+      const index = normT * (count - 1);
+      const i0 = Math.floor(index);
+      const i1 = Math.min(i0 + 1, count - 1);
+      const frac = index - i0;
 
-    const pointLight3 = new THREE.PointLight(themeRef.current.lights[2], 3.5, 300);
-    pointLight3.position.set(0, 90, -20);
-    scene.add(pointLight3);
-
-    // --- Particle Texture Generator ---
-    const createParticleTexture = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = 64;
-      canvas.height = 64;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) return null;
-
-      const grad = ctx.createRadialGradient(32, 32, 0, 32, 32, 32);
-      grad.addColorStop(0, "rgba(255, 255, 255, 1)");
-      grad.addColorStop(0.3, "rgba(255, 255, 255, 0.8)");
-      grad.addColorStop(0.65, "rgba(255, 255, 255, 0.2)");
-      grad.addColorStop(1, "rgba(255, 255, 255, 0)");
-      ctx.fillStyle = grad;
-      ctx.beginPath();
-      ctx.arc(32, 32, 32, 0, Math.PI * 2);
-      ctx.fill();
-
-      return new THREE.CanvasTexture(canvas);
+      const c0 = new THREE.Color(stops[i0]);
+      const c1 = new THREE.Color(stops[i1]);
+      target.copy(c0).lerp(c1, frac);
     };
-    const particleTexture = createParticleTexture();
 
-    // --- 1. SOLID BOLD 3D LETTERS "SHRIVARDHAN" ---
+    // --- 1. SOLID BOLD COLORFUL 3D LETTERS "SHRIVARDHAN" ---
     const textGroup = new THREE.Group();
     scene.add(textGroup);
 
     let textMesh: THREE.Mesh | null = null;
-    let frontMat: THREE.MeshStandardMaterial;
-    let sideMat: THREE.MeshStandardMaterial;
+    let textGeo: TextGeometry | null = null;
+    let basePositions: Float32Array | null = null;
+    let colorAttr: THREE.BufferAttribute | null = null;
+    let minX = 0;
+    let rangeX = 1;
 
     const fontLoader = new FontLoader();
     fontLoader.load(
       "/helvetiker_bold.typeface.json",
       (font) => {
-        // Base size for 3D text
-        const textGeo = new TextGeometry("SHRIVARDHAN", {
+        textGeo = new TextGeometry("SHRIVARDHAN", {
           font: font,
-          size: 11,
-          depth: 3.5,
+          size: 10,
+          depth: 3.2,
           curveSegments: 12,
           bevelEnabled: true,
-          bevelThickness: 0.9,
-          bevelSize: 0.5,
+          bevelThickness: 0.8,
+          bevelSize: 0.4,
           bevelOffset: 0,
-          bevelSegments: 5,
+          bevelSegments: 4,
         });
 
+        textGeo.computeBoundingBox();
         textGeo.computeVertexNormals();
-        textGeo.center(); // Center horizontally & vertically
+        textGeo.center(); // Perfect center at local (0, 0, 0)
 
-        const currentTheme = themeRef.current;
+        if (textGeo.boundingBox) {
+          minX = textGeo.boundingBox.min.x;
+          rangeX = textGeo.boundingBox.max.x - minX;
+        }
 
-        frontMat = new THREE.MeshStandardMaterial({
-          color: currentTheme.frontColor,
-          metalness: 0.85,
-          roughness: 0.18,
-          emissive: currentTheme.emissive,
-          emissiveIntensity: 0.4,
+        const posAttr = textGeo.getAttribute("position");
+        const vertexCount = posAttr.count;
+        basePositions = new Float32Array(posAttr.array);
+
+        const colors = new Float32Array(vertexCount * 3);
+        const tempColor = new THREE.Color();
+
+        for (let i = 0; i < vertexCount; i++) {
+          const x = posAttr.getX(i);
+          const t = rangeX > 0 ? (x - minX) / rangeX : 0.5;
+          samplePaletteColor(t, paletteRef.current, tempColor);
+
+          colors[i * 3] = tempColor.r;
+          colors[i * 3 + 1] = tempColor.g;
+          colors[i * 3 + 2] = tempColor.b;
+        }
+
+        colorAttr = new THREE.BufferAttribute(colors, 3);
+        textGeo.setAttribute("color", colorAttr);
+
+        // Glossy metallic finish reflecting vibrant colors
+        const textMat = new THREE.MeshPhysicalMaterial({
+          vertexColors: true,
+          metalness: 0.7,
+          roughness: 0.16,
+          clearcoat: 1.0,
+          clearcoatRoughness: 0.1,
+          reflectivity: 0.9,
+          emissive: 0x111122,
+          emissiveIntensity: 0.35,
         });
 
-        sideMat = new THREE.MeshStandardMaterial({
-          color: currentTheme.sideColor,
-          metalness: 0.75,
-          roughness: 0.3,
-          emissive: currentTheme.emissive,
-          emissiveIntensity: 0.6,
-        });
-
-        textMesh = new THREE.Mesh(textGeo, [frontMat, sideMat]);
-        textMesh.castShadow = true;
-        textMesh.receiveShadow = true;
-
+        textMesh = new THREE.Mesh(textGeo, textMat);
         textGroup.add(textMesh);
-        adjustTextScale();
+
+        updateTextPositionAndScale();
       },
       undefined,
       (err) => {
-        console.warn("Could not load 3D font, falling back to particle typography", err);
+        console.warn("Could not load 3D font:", err);
       }
     );
 
-    // Calculate scale and position so SHRIVARDHAN fits beautifully on both mobile and desktop
-    const adjustTextScale = () => {
-      const w = window.innerWidth;
-      const isMobile = w < 768;
+    // Exact projection to align directly into #shrivardhan-anchor DOM element
+    const updateTextPositionAndScale = () => {
+      const vFOV = THREE.MathUtils.degToRad(camera.fov);
+      const visibleHeight = 2 * Math.tan(vFOV / 2) * camera.position.z;
+      const visibleWidth = visibleHeight * (window.innerWidth / window.innerHeight);
 
-      if (textMesh) {
-        // Base width of "SHRIVARDHAN" is approx 115 world units
-        // On mobile (e.g. 390px), world width is approx 75 units, so scale = 0.52
-        // On desktop, scale = 0.95
-        const targetScale = isMobile
-          ? Math.max(Math.min((w / 768) * 0.75, 0.65), 0.42)
-          : Math.min(Math.max((w / 1440) * 1.0, 0.8), 1.15);
+      const anchor = document.getElementById("shrivardhan-anchor");
+      if (anchor && textMesh) {
+        const rect = anchor.getBoundingClientRect();
+        const centerX = window.innerWidth / 2;
+        const centerY = window.innerHeight / 2;
 
-        textMesh.scale.setScalar(targetScale);
+        // Mathematical projection from screen pixels to 3D world units
+        const anchorCenterPixelX = rect.left + rect.width / 2;
+        const anchorCenterPixelY = rect.top + rect.height / 2;
 
-        // Position above the input container
-        // On mobile, position slightly higher (y = 48), on desktop y = 44
-        textGroup.position.set(0, isMobile ? 48 : 44, 0);
+        const worldX = (anchorCenterPixelX - centerX) * (visibleWidth / window.innerWidth);
+        const worldY = -(anchorCenterPixelY - centerY) * (visibleHeight / window.innerHeight);
+
+        textGroup.position.set(worldX, worldY, 0);
+
+        // Scale to fit naturally inside the anchor width
+        // Base width of "SHRIVARDHAN" bounding box is ~104 world units
+        const isMobile = window.innerWidth < 768;
+        const maxAllowedPixelWidth = isMobile
+          ? Math.min(window.innerWidth * 0.88, 380)
+          : Math.min(rect.width * 0.85, 480);
+
+        const desiredWorldWidth = (maxAllowedPixelWidth / window.innerWidth) * visibleWidth;
+        const scale = desiredWorldWidth / 104;
+
+        textMesh.scale.setScalar(scale);
       }
     };
 
-    // --- 2. Surrounding Nebula & Stardust Particles ---
-    const starCount = 650;
+    // --- 2. Surrounding Nebula Particle Glow ---
+    const starCount = 450;
     const starGeo = new THREE.BufferGeometry();
     const starPos = new Float32Array(starCount * 3);
     const starColors = new Float32Array(starCount * 3);
 
-    const palette = themeRef.current.particles.map((c) => new THREE.Color(c));
-
     for (let i = 0; i < starCount; i++) {
-      const radius = 50 + Math.random() * 160;
+      const radius = 60 + Math.random() * 140;
       const theta = Math.random() * Math.PI * 2;
-      const phi = (Math.random() - 0.5) * Math.PI * 0.85;
+      const phi = (Math.random() - 0.5) * Math.PI * 0.9;
 
       starPos[i * 3] = radius * Math.cos(theta) * Math.cos(phi);
       starPos[i * 3 + 1] = radius * Math.sin(phi);
-      starPos[i * 3 + 2] = radius * Math.sin(theta) * Math.cos(phi) - 25;
+      starPos[i * 3 + 2] = radius * Math.sin(theta) * Math.cos(phi) - 30;
 
-      const col = palette[Math.floor(Math.random() * palette.length)];
+      const t = Math.random();
+      const col = new THREE.Color();
+      samplePaletteColor(t, paletteRef.current, col);
+
       starColors[i * 3] = col.r;
       starColors[i * 3 + 1] = col.g;
       starColors[i * 3 + 2] = col.b;
@@ -238,8 +269,7 @@ export function ShrivardhanCosmos() {
       size: 2.2,
       vertexColors: true,
       transparent: true,
-      opacity: 0.75,
-      map: particleTexture ?? undefined,
+      opacity: 0.65,
       blending: THREE.AdditiveBlending,
       depthWrite: false,
     });
@@ -247,71 +277,55 @@ export function ShrivardhanCosmos() {
     const starField = new THREE.Points(starGeo, starMat);
     scene.add(starField);
 
-    // --- 3. Floating 3D Geometric Gem Shapes ---
+    // --- 3. Geometric Perimeter Accents (Sides only) ---
     const shapesGroup = new THREE.Group();
     scene.add(shapesGroup);
 
     // Left floating Torus Knot
-    const knotGeo = new THREE.TorusKnotGeometry(12, 2.8, 90, 16, 2, 3);
-    const knotMat = new THREE.MeshStandardMaterial({
-      color: 0x38bdf8,
-      metalness: 0.9,
-      roughness: 0.2,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.55,
-    });
-    const knotMesh = new THREE.Mesh(knotGeo, knotMat);
+    const knotMesh = new THREE.Mesh(
+      new THREE.TorusKnotGeometry(10, 2.2, 80, 16, 2, 3),
+      new THREE.MeshStandardMaterial({
+        color: 0x00f0ff,
+        metalness: 0.85,
+        roughness: 0.2,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.45,
+      })
+    );
     shapesGroup.add(knotMesh);
 
     // Right floating Icosahedron
-    const icoGeo = new THREE.IcosahedronGeometry(14, 1);
-    const icoMat = new THREE.MeshStandardMaterial({
-      color: 0xf43f5e,
-      metalness: 0.9,
-      roughness: 0.2,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.6,
-    });
-    const icoMesh = new THREE.Mesh(icoGeo, icoMat);
+    const icoMesh = new THREE.Mesh(
+      new THREE.IcosahedronGeometry(11, 1),
+      new THREE.MeshStandardMaterial({
+        color: 0xff007b,
+        metalness: 0.85,
+        roughness: 0.2,
+        wireframe: true,
+        transparent: true,
+        opacity: 0.5,
+      })
+    );
     shapesGroup.add(icoMesh);
 
-    // Bottom floating Octahedron
-    const octGeo = new THREE.OctahedronGeometry(11, 0);
-    const octMat = new THREE.MeshStandardMaterial({
-      color: 0xa855f7,
-      metalness: 0.8,
-      roughness: 0.25,
-      wireframe: true,
-      transparent: true,
-      opacity: 0.5,
-    });
-    const octMesh = new THREE.Mesh(octGeo, octMat);
-    shapesGroup.add(octMesh);
-
-    const positionShapes = () => {
+    const positionPerimeterShapes = () => {
       const isMobile = window.innerWidth < 768;
       if (isMobile) {
-        // Move geometries wider / further back so they frame phone screen without blocking cards
-        knotMesh.position.set(-65, 30, -50);
-        icoMesh.position.set(65, -10, -50);
-        octMesh.position.set(0, -75, -40);
-        knotMesh.scale.setScalar(0.7);
-        icoMesh.scale.setScalar(0.7);
-        octMesh.scale.setScalar(0.7);
+        knotMesh.position.set(-65, 40, -45);
+        icoMesh.position.set(65, 20, -45);
+        knotMesh.scale.setScalar(0.6);
+        icoMesh.scale.setScalar(0.6);
       } else {
-        knotMesh.position.set(-145, 35, -30);
-        icoMesh.position.set(145, -20, -30);
-        octMesh.position.set(-70, -80, -20);
-        knotMesh.scale.setScalar(1);
-        icoMesh.scale.setScalar(1);
-        octMesh.scale.setScalar(1);
+        knotMesh.position.set(-155, 30, -30);
+        icoMesh.position.set(155, -10, -30);
+        knotMesh.scale.setScalar(0.95);
+        icoMesh.scale.setScalar(0.95);
       }
     };
-    positionShapes();
+    positionPerimeterShapes();
 
-    // --- Interactive Mouse & Mobile Touch Controls ---
+    // --- Mouse & Touch Controls ---
     const pointer = {
       x: 0,
       y: 0,
@@ -335,21 +349,24 @@ export function ShrivardhanCosmos() {
     window.addEventListener("mousemove", handleMouseMove, { passive: true });
     window.addEventListener("touchmove", handleTouchMove, { passive: true });
 
-    // --- Resize Handler ---
-    const handleResize = () => {
+    // --- Resize & Scroll Handler ---
+    const handleResizeOrScroll = () => {
       if (!camera || !renderer) return;
       camera.aspect = window.innerWidth / window.innerHeight;
       camera.updateProjectionMatrix();
       renderer.setSize(window.innerWidth, window.innerHeight);
-      adjustTextScale();
-      positionShapes();
+
+      updateTextPositionAndScale();
+      positionPerimeterShapes();
     };
 
-    window.addEventListener("resize", handleResize);
+    window.addEventListener("resize", handleResizeOrScroll);
+    window.addEventListener("scroll", handleResizeOrScroll, { passive: true });
 
     // --- Animation Loop ---
     let animId: number;
     const clock = new THREE.Clock();
+    const tempCol = new THREE.Color();
 
     const animate = () => {
       animId = requestAnimationFrame(animate);
@@ -359,62 +376,77 @@ export function ShrivardhanCosmos() {
       pointer.x += (pointer.targetX - pointer.x) * 0.05;
       pointer.y += (pointer.targetY - pointer.y) * 0.05;
 
-      // Camera parallax tilt
-      camera.position.x = pointer.x * 18;
-      camera.position.y = 5 + pointer.y * 12;
-      camera.lookAt(0, 15, 0);
+      // Subtle parallax camera angle (keep horizon straight for crisp text readability)
+      camera.position.x = pointer.x * 12;
+      camera.position.y = pointer.y * 8;
+      camera.lookAt(0, textGroup.position.y, 0);
 
-      // 3D Solid Text dynamic float & subtle tilt
-      if (textMesh) {
-        textMesh.rotation.y = Math.sin(elapsed * 1.1) * 0.08 + pointer.x * 0.15;
-        textMesh.rotation.x = Math.cos(elapsed * 0.9) * 0.05 - pointer.y * 0.12;
-        textMesh.position.y = Math.sin(elapsed * 1.5) * 1.8;
+      // --- Dynamic Rainbow Color Flow across 3D Letters ---
+      if (textMesh && textGeo && colorAttr && basePositions) {
+        const pos = textGeo.getAttribute("position") as THREE.BufferAttribute;
+        const count = pos.count;
+        const activePalette = paletteRef.current;
+        const colorArray = colorAttr.array as Float32Array;
 
-        // Smooth color transition on theme change
-        const currentTheme = themeRef.current;
-        frontMat.color.lerp(new THREE.Color(currentTheme.frontColor), 0.06);
-        sideMat.color.lerp(new THREE.Color(currentTheme.sideColor), 0.06);
-        frontMat.emissive.lerp(new THREE.Color(currentTheme.emissive), 0.06);
-        sideMat.emissive.lerp(new THREE.Color(currentTheme.emissive), 0.06);
+        // Flow speed
+        const shiftOffset = elapsed * 0.12;
 
-        // Update lights
-        pointLight1.color.lerp(new THREE.Color(currentTheme.lights[0]), 0.05);
-        pointLight2.color.lerp(new THREE.Color(currentTheme.lights[1]), 0.05);
-        pointLight3.color.lerp(new THREE.Color(currentTheme.lights[2]), 0.05);
+        for (let i = 0; i < count; i++) {
+          const x = basePositions[i * 3];
+          const t = rangeX > 0 ? (x - minX) / rangeX : 0.5;
+
+          // Shimmer wave across letters
+          const animatedT = t - shiftOffset;
+          samplePaletteColor(animatedT, activePalette, tempCol);
+
+          colorArray[i * 3] = tempCol.r;
+          colorArray[i * 3 + 1] = tempCol.g;
+          colorArray[i * 3 + 2] = tempCol.b;
+        }
+
+        colorAttr.needsUpdate = true;
+
+        // Gentle 3D floating & breathing tilt
+        textMesh.rotation.y = Math.sin(elapsed * 1.2) * 0.05 + pointer.x * 0.1;
+        textMesh.rotation.x = Math.cos(elapsed * 0.9) * 0.03 - pointer.y * 0.08;
       }
 
-      // Rotate geometric shapes
-      knotMesh.rotation.x = elapsed * 0.35;
-      knotMesh.rotation.y = elapsed * 0.25;
+      // Orbit dynamic specular lights around the 3D text
+      const ty = textGroup.position.y;
+      pLight1.position.set(Math.sin(elapsed * 1.1) * 90, ty + 25 + Math.cos(elapsed * 0.7) * 20, 50);
+      pLight2.position.set(-Math.sin(elapsed * 0.9) * 90, ty - 15 + Math.cos(elapsed * 0.8) * 20, 45);
+      pLight3.position.set(Math.cos(elapsed * 1.3) * 70, ty + 10, 60);
+      pLight4.position.set(-Math.cos(elapsed * 1.0) * 80, ty - 20, 40);
 
-      icoMesh.rotation.x = elapsed * 0.25;
-      icoMesh.rotation.y = -elapsed * 0.4;
+      // Update light colors smoothly to match active palette
+      const curL = paletteRef.current.lights;
+      pLight1.color.lerp(new THREE.Color(curL[0]), 0.05);
+      pLight2.color.lerp(new THREE.Color(curL[1]), 0.05);
+      pLight3.color.lerp(new THREE.Color(curL[2]), 0.05);
+      pLight4.color.lerp(new THREE.Color(curL[3]), 0.05);
 
-      octMesh.rotation.y = elapsed * 0.5;
-      octMesh.rotation.z = elapsed * 0.25;
+      // Orbit perimeter shapes
+      knotMesh.rotation.x = elapsed * 0.3;
+      knotMesh.rotation.y = elapsed * 0.2;
+      icoMesh.rotation.x = elapsed * 0.2;
+      icoMesh.rotation.y = -elapsed * 0.3;
 
-      // Orbit dynamic lights to create shifting bevel highlights
-      pointLight1.position.x = Math.sin(elapsed * 0.8) * 110;
-      pointLight1.position.y = 50 + Math.cos(elapsed * 0.6) * 50;
-      pointLight2.position.x = -Math.sin(elapsed * 0.7) * 110;
-      pointLight2.position.y = -20 + Math.cos(elapsed * 0.9) * 40;
-      pointLight3.position.x = Math.cos(elapsed * 1.0) * 80;
-      pointLight3.position.z = Math.sin(elapsed * 1.0) * 60;
-
-      // Slow galaxy rotation
-      starField.rotation.y = elapsed * 0.02;
+      starField.rotation.y = elapsed * 0.015;
 
       renderer.render(scene, camera);
     };
 
     animate();
 
-    // --- Cleanup ---
+    // Trigger initial positioning
+    setTimeout(updateTextPositionAndScale, 50);
+
     return () => {
       cancelAnimationFrame(animId);
       window.removeEventListener("mousemove", handleMouseMove);
       window.removeEventListener("touchmove", handleTouchMove);
-      window.removeEventListener("resize", handleResize);
+      window.removeEventListener("resize", handleResizeOrScroll);
+      window.removeEventListener("scroll", handleResizeOrScroll);
 
       if (container && renderer.domElement) {
         container.removeChild(renderer.domElement);
@@ -425,35 +457,35 @@ export function ShrivardhanCosmos() {
     };
   }, []);
 
-  const nextTheme = () => {
-    setThemeIdx((prev) => (prev + 1) % THEMES.length);
+  const nextPalette = () => {
+    setPaletteIdx((prev) => (prev + 1) % PALETTES.length);
   };
 
   return (
     <>
-      {/* Three.js 3D Canvas Background (non-blocking for clicks/typing) */}
+      {/* 3D Canvas Background */}
       <div
         ref={containerRef}
         className="fixed inset-0 pointer-events-none z-0 overflow-hidden"
         aria-hidden="true"
       />
 
-      {/* Floating 3D Control Pill - Responsive & Mobile friendly */}
-      <div className="fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-40 flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-white/80 dark:bg-zinc-900/80 px-3 py-1.5 shadow-lg backdrop-blur-md text-xs text-foreground transition-all hover:bg-white/95 dark:hover:bg-zinc-900/95">
+      {/* Floating 3D Control Pill */}
+      <div className="fixed bottom-3 right-3 sm:bottom-5 sm:right-5 z-40 flex items-center gap-2 rounded-full border border-black/10 dark:border-white/10 bg-white/85 dark:bg-zinc-900/85 px-3 py-1.5 shadow-lg backdrop-blur-md text-xs text-foreground transition-all hover:bg-white/95 dark:hover:bg-zinc-900/95">
         <span className="flex h-2 w-2 relative">
-          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-emerald-400 opacity-75"></span>
-          <span className="relative inline-flex rounded-full h-2 w-2 bg-emerald-500"></span>
+          <span className="animate-ping absolute inline-flex h-full w-full rounded-full bg-pink-400 opacity-75"></span>
+          <span className="relative inline-flex rounded-full h-2 w-2 bg-pink-500"></span>
         </span>
-        <span className="font-bold tracking-wider bg-gradient-to-r from-sky-500 via-indigo-500 to-pink-500 bg-clip-text text-transparent">
+        <span className="font-extrabold tracking-wider bg-gradient-to-r from-pink-500 via-amber-500 to-cyan-500 bg-clip-text text-transparent">
           3D SHRIVARDHAN
         </span>
         <button
           type="button"
-          onClick={nextTheme}
+          onClick={nextPalette}
           className="ml-1 cursor-pointer rounded-full bg-black/5 dark:bg-white/10 px-2.5 py-0.5 text-[11px] font-medium hover:bg-black/10 dark:hover:bg-white/20 transition-colors active:scale-95"
-          title="Switch 3D Color Palette"
+          title="Switch 3D Rainbow Palette"
         >
-          🎨 {THEMES[themeIdx].name}
+          🎨 {PALETTES[paletteIdx].name}
         </button>
       </div>
     </>

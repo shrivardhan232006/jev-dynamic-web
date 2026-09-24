@@ -287,7 +287,11 @@ export function Shapeshift() {
 
   return (
     <MotionConfig reducedMotion="user">
-      <main id="main" className="mx-auto w-full max-w-[560px] px-4 pt-[16vh] pb-24 sm:px-0 sm:pt-[22vh]">
+      <main id="main" className="mx-auto w-full max-w-[560px] px-4 pt-[10vh] pb-24 sm:px-0 sm:pt-[14vh]">
+        {/* 3D Header Anchor - Positioned right above the input container */}
+        <div id="shrivardhan-anchor" className="mb-5 sm:mb-7 flex h-14 sm:h-18 w-full items-center justify-center">
+          <span className="sr-only">Shrivardhan</span>
+        </div>
         <h1 className="sr-only">Shapeshift</h1>
         <MorphContainer readiness={readiness} edge={ghost ? null : (meta?.edge ?? null)}>
           <motion.div layout="position" className="relative flex h-[72px] items-center px-5">
