@@ -1,12 +1,14 @@
 "use client";
 
-import { Pause, Play, RotateCcw } from "lucide-react";
+import { Pause, Play, RotateCcw, Plus } from "lucide-react";
 import { motion, useReducedMotion } from "motion/react";
 import { useEffect, useRef, useState } from "react";
 import { Button } from "@/components/ui/button";
 import type { TimerData } from "@/lib/parse/timer";
 import { formatClock } from "@/lib/parse/timer";
 import { spring } from "@/lib/motion";
+import { notify } from "@/lib/notify";
+import { sound } from "@/lib/sound";
 import { Field, Meta, Placeholder } from "./shared";
 import type { CardProps } from "./types";
 
@@ -19,8 +21,11 @@ const RING_COLOR = { countdown: "var(--foreground)", focus: "var(--brand)", brea
 export function TimerRing({ data, signals, interactive }: CardProps<TimerData>) {
   const kind = signals.timerKind ?? (data.seconds ? "countdown" : "stopwatch");
   const stopwatch = kind === "stopwatch" || !data.seconds;
-  const total = data.seconds ?? 0;
+  const initialTotal = data.seconds ?? 0;
   const reduce = useReducedMotion();
+
+  const [extraSeconds, setExtraSeconds] = useState(0);
+  const total = initialTotal + extraSeconds;
 
   const [running, setRunning] = useState(false);
   const [elapsed, setElapsed] = useState(0);
@@ -28,9 +33,10 @@ export function TimerRing({ data, signals, interactive }: CardProps<TimerData>) 
   const base = useRef(0);
 
   // A new duration resets the clock.
-  const [prevTotal, setPrevTotal] = useState(total);
-  if (prevTotal !== total) {
-    setPrevTotal(total);
+  const [prevInitial, setPrevInitial] = useState(initialTotal);
+  if (prevInitial !== initialTotal) {
+    setPrevInitial(initialTotal);
+    setExtraSeconds(0);
     setElapsed(0);
     setRunning(false);
   }
@@ -42,14 +48,35 @@ export function TimerRing({ data, signals, interactive }: CardProps<TimerData>) 
     const id = setInterval(() => {
       const e = base.current + (performance.now() - (startedAt.current ?? 0)) / 1000;
       setElapsed(stopwatch ? e : Math.min(total, e));
-      if (!stopwatch && e >= total) setRunning(false);
+      if (!stopwatch && e >= total) {
+        setRunning(false);
+        sound.timerEnd();
+        notify("Timer finished! 🔔");
+      }
     }, 200);
     return () => clearInterval(id);
     // eslint-disable-next-line react-hooks/exhaustive-deps -- only (re)start on toggle
-  }, [running]);
+  }, [running, total, stopwatch]);
 
-  const shown = stopwatch ? elapsed : total - elapsed;
+  const shown = stopwatch ? elapsed : Math.max(0, total - elapsed);
   const progress = stopwatch ? (elapsed % 60) / 60 : total ? 1 - elapsed / total : 0;
+
+  const toggleRun = () => {
+    sound.tick();
+    setRunning((r) => !r);
+  };
+
+  const handleReset = () => {
+    sound.tick();
+    setRunning(false);
+    setElapsed(0);
+  };
+
+  const addTime = (secs: number) => {
+    sound.tick();
+    setExtraSeconds((prev) => prev + secs);
+    notify(`Added +${secs / 60}m to timer!`);
+  };
 
   return (
     <div className="flex flex-wrap items-center gap-6">
@@ -77,11 +104,11 @@ export function TimerRing({ data, signals, interactive }: CardProps<TimerData>) 
       <Field index={1} className="flex min-w-0 flex-col gap-3">
         <div className="flex flex-col gap-0.5">
           <h2 className="text-[17px] leading-6 font-[550] text-balance">{data.label || (stopwatch ? "Stopwatch" : "Timer")}</h2>
-          {data.seconds ? <Meta>{describe(data.seconds)}</Meta> : <Placeholder insert=" 10 min">Add duration</Placeholder>}
+          {total ? <Meta>{describe(total)}</Meta> : <Placeholder insert=" 10 min">Add duration</Placeholder>}
         </div>
-        <div className="flex gap-2">
-          <Button size="sm" disabled={!interactive || (!stopwatch && elapsed >= total)} onClick={() => setRunning((r) => !r)}>
-            {running ? <Pause /> : <Play />}
+        <div className="flex flex-wrap items-center gap-2">
+          <Button size="sm" disabled={!interactive || (!stopwatch && elapsed >= total && total > 0)} onClick={toggleRun}>
+            {running ? <Pause className="size-4" /> : <Play className="size-4" />}
             {running ? "Pause" : elapsed > 0 ? "Resume" : "Start"}
           </Button>
           <Button
@@ -89,13 +116,33 @@ export function TimerRing({ data, signals, interactive }: CardProps<TimerData>) 
             variant="ghost"
             aria-label="Reset"
             disabled={!interactive || elapsed === 0}
-            onClick={() => {
-              setRunning(false);
-              setElapsed(0);
-            }}
+            onClick={handleReset}
           >
-            <RotateCcw />
+            <RotateCcw className="size-4" />
           </Button>
+
+          {interactive && !stopwatch && (
+            <div className="flex items-center gap-1 ms-1">
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => addTime(60)}
+                className="h-8 rounded-full px-2 text-xs text-muted-foreground hover:text-foreground"
+              >
+                <Plus className="size-3 me-0.5" />
+                1m
+              </Button>
+              <Button
+                size="sm"
+                variant="outline"
+                onClick={() => addTime(300)}
+                className="h-8 rounded-full px-2 text-xs text-muted-foreground hover:text-foreground"
+              >
+                <Plus className="size-3 me-0.5" />
+                5m
+              </Button>
+            </div>
+          )}
         </div>
       </Field>
     </div>

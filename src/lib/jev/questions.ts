@@ -11,7 +11,7 @@ import { choice, noul, score } from "@typesafe-ai/sdk";
 export const questions = {
   // ── Which UI ────────────────────────────────────────────────
   intent: choice("What is the person trying to create with this text", {
-    event: "Scheduling a meeting, meal, call or gathering at a time, usually with other people",
+    event: "Scheduling a meeting, meal, call or gathering, or viewing, opening, and checking calendar events",
     reminder: "Asking to be reminded to do a single task themselves, e.g. 'remind me to…'",
     todo: "Listing several separate things to do or buy",
     timer: "Starting a timer, countdown, focus session or stopwatch for a duration",
@@ -24,7 +24,8 @@ export const questions = {
     travel: "Planning a trip, flight, train or stay to a destination",
     poll: "Asking a group to choose between options",
     contact: "Saving a person's name with a phone number or email address",
-    link: "Saving a web link or URL, optionally with a note",
+    link: "Saving a web link or URL, or searching/requesting files and links from Google Drive or OneDrive",
+    gmail: "Searching, reading, or composing an email or message in a mailbox",
     countdown: "Counting the days until a future date, holiday or event",
     timezone: "Converting a time of day between time zones or cities, or asking the time somewhere",
     random: "Asking for a random result: rolling dice, flipping a coin, a random number or letting chance pick",

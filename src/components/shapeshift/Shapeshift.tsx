@@ -22,8 +22,11 @@ import { IntentPalette } from "./IntentPalette";
 import { LatencyHud } from "./LatencyHud";
 import { MorphContainer } from "./MorphContainer";
 import { RecentStack } from "./RecentStack";
+import { ConnectedAppsModal } from "./ConnectedAppsModal";
 import { newId, type SavedItem, savedItems } from "@/lib/savedItems";
 import { notify } from "@/lib/notify";
+import { sound } from "@/lib/sound";
+import { dispatchWebhook, getWebhookSettings } from "@/lib/integrations/webhook";
 
 const subscribeNoop = () => () => {};
 
@@ -143,6 +146,18 @@ export function Shapeshift() {
       savedItems.update((list) => (flags.demo ? [item, ...list].slice(0, 9) : [item, ...list])); // demo list is in-memory
       setAnnouncement(`Added ${registry[target].label.toLowerCase()}: ${summary}`);
     }
+    sound.chime();
+    const webhookSettings = getWebhookSettings();
+    if (webhookSettings.enabled && webhookSettings.autoDispatch) {
+      dispatchWebhook({
+        event: editingId !== null ? "card_updated" : "card_created",
+        intent: target,
+        summary,
+        text,
+        signals: gated,
+      });
+    }
+
     setFlyingId(editingId ?? draftId);
     // Saving with the button (or a card control) keeps you in flow: focus returns to the input.
     requestAnimationFrame(() => inputRef.current?.focus());
@@ -279,9 +294,11 @@ export function Shapeshift() {
             <input
               ref={inputRef}
               value={text}
+              suppressHydrationWarning
               onChange={(e) => {
                 const v = e.target.value;
                 setText(v);
+                sound.tick();
                 if (!v.trim()) {
                   setMem(initialMemory);
                   setGated(neutralGated);
@@ -346,6 +363,7 @@ export function Shapeshift() {
       </main>
 
       <IntentPalette open={paletteOpen} onOpenChange={setPaletteOpen} onPick={pick} />
+      <ConnectedAppsModal />
       <LatencyHud {...hud} large={flags.demo} />
       {flags.debug && <DebugPanel result={result} mem={mem} gated={gated} />}
     </MotionConfig>

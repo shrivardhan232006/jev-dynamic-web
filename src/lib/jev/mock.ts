@@ -19,7 +19,7 @@ import {
 } from "./types";
 
 /** Keep in sync with questions.ts (asserted in tests). */
-export const MOCK_QUESTION_COUNT = 14;
+export const MOCK_QUESTION_COUNT = 15;
 export const MOCK_MODEL = "jev-offline";
 
 const has = (re: RegExp, t: string) => re.test(t);
@@ -47,6 +47,13 @@ function intentScores(raw: string): Scores {
   const num = /\d/.test(t);
 
   if (has(/https?:\/\/|www\.|\b[a-z0-9-]+\.(com|dev|io|app|org|net|co|ai|in|so)\b/, t)) add("link", 6);
+  if (has(/\b(?:google\s+drive|drive|onedrive|gdrive)\b/, t)) add("link", 6.5);
+  if (has(/\b(?:link|url|file)\s+(?:to|for|from|in)\b/, t)) add("link", 3.5);
+  // Gmail / email intent
+  if (has(/\b(emails?|mail|inbox|gmail|mailbox)\s+(from|by|about|regarding)\b/, t)) add("gmail", 6.5);
+  if (has(/\b(search|find|check)\s+(my\s+)?(emails?|mail|inbox|gmail)\b/, t)) add("gmail", 6);
+  if (has(/\b(send|write|compose|draft)\s+(an?\s+)?(email|mail)\b/, t)) add("gmail", 6);
+  if (has(/\b(emails?|mail|inbox|gmail)\b/, t) && words.length >= 2) add("gmail", 3);
   if (has(/#[0-9a-f]{3}\b|#[0-9a-f]{6}\b|rgba?\(/, t)) add("color", 7);
   if (has(/#[0-9a-f]{1,5}$/, t)) add("color", 3);
   if (has(COLOR_WORDS, t)) add("color", 2.5);
@@ -96,6 +103,8 @@ function intentScores(raw: string): Scores {
   if (has(DATE_WORDS, t)) add("event", gather || words.length <= 6 ? 2.5 : 1);
   if (gather) add("event", 3);
   if (has(/\b(on|over|via) (zoom|meet|teams|facetime)\b/, t)) add("event", 2);
+  if (has(/\b(?:calendar|gcal|schedule|agenda|meetings?|appointments?)\b/, t)) add("event", 6);
+  if (has(/\b(?:check|open|view|show)\s+(?:my\s+)?calendar\b/, t)) add("event", 7);
   if (has(/\b(i think|i feel|felt|feeling|thinking|wonder|realized|idea|thought|maybe we)\b/, t)) add("note", 2);
   if (words.length >= 8) add("note", 3);
   else if (words.length >= 5) add("note", 2.2);
@@ -117,6 +126,7 @@ function intentScores(raw: string): Scores {
   if ((s.contact ?? 0) >= 4) s.timer = 0;
   if ((s.timer ?? 0) >= 3) s.convert = Math.min(s.convert ?? 0, 1);
   if ((s.link ?? 0) >= 6) s.note = 0;
+  if ((s.gmail ?? 0) >= 6) { s.contact = Math.min(s.contact ?? 0, 2); s.note = Math.min(s.note ?? 0, 1); }
   if ((s.countdown ?? 0) >= 6) s.event = Math.min(s.event ?? 0, 2);
   if ((s.timezone ?? 0) >= 5.5) {
     s.event = Math.min(s.event ?? 0, 2);

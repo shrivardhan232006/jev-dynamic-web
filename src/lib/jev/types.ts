@@ -15,6 +15,7 @@ export const INTENT_KEYS = [
   "poll",
   "contact",
   "link",
+  "gmail",
   "countdown",
   "timezone",
   "random",

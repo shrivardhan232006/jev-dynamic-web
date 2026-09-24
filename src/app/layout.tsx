@@ -27,10 +27,10 @@ export const metadata: Metadata = {
 // viewport-fit=cover lets fixed chrome (HUD, toasts) pad itself away from the home indicator.
 export const viewport: Viewport = { themeColor: "#fafaf9", colorScheme: "light", viewportFit: "cover" };
 
-export default function RootLayout({ children }: LayoutProps<"/">) {
+export default function RootLayout({ children }: { children: React.ReactNode }) {
   return (
-    <html lang="en" className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
-      <body className="min-h-full bg-background font-sans text-foreground">
+    <html lang="en" suppressHydrationWarning className={`${geistSans.variable} ${geistMono.variable} h-full antialiased`}>
+      <body suppressHydrationWarning className="min-h-full bg-background font-sans text-foreground">
         <TooltipProvider>{children}</TooltipProvider>
         <Toaster />
       </body>

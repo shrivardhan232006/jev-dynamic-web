@@ -18,6 +18,7 @@ import { completeCountdown, parseCountdown, type CountdownData } from "./countdo
 import { completeTimezone, parseTimezone, type TimezoneData } from "./timezone";
 import { completeRandom, parseRandom, type RandomData } from "./random";
 import { completeGoal, parseGoal, type GoalData } from "./goal";
+import { completeGmail, parseGmail, type GmailData } from "@/components/intents/GmailCard";
 
 export type ParsedMap = {
   event: EventData;
@@ -34,6 +35,7 @@ export type ParsedMap = {
   poll: PollData;
   contact: ContactData;
   link: LinkData;
+  gmail: GmailData;
   countdown: CountdownData;
   timezone: TimezoneData;
   random: RandomData;
@@ -63,6 +65,7 @@ export const parsers: { [K in CardIntent]: Parser<K> } = {
   poll: { parse: (t) => parsePoll(t), complete: completePoll },
   contact: { parse: (t) => parseContact(t), complete: completeContact },
   link: { parse: (t) => parseLink(t), complete: completeLink },
+  gmail: { parse: (t) => parseGmail(t), complete: completeGmail },
   countdown: { parse: (t, c) => parseCountdown(t, c.ref), complete: completeCountdown },
   timezone: { parse: (t, c) => parseTimezone(t, c.ref), complete: completeTimezone },
   random: { parse: (t) => parseRandom(t), complete: completeRandom },

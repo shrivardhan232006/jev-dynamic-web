@@ -32,9 +32,9 @@ function getClient() {
   if (!client) {
     client = new TypeSafeClient({
       defaultModel: process.env.JEV_MODEL || "jev-latest",
-      // One fast attempt: a stale answer is worse than falling back to the mock.
+      // One attempt with reasonable headroom for global network latency.
       retry: { maxRetries: 0 },
-      timeout: 2500,
+      timeout: 6000,
     });
   }
   return client;

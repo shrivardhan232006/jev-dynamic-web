@@ -3,6 +3,8 @@ import { capitalize, collapse, findDate, removeRange, tidy, titleCase } from "./
 export type EventData = {
   title: string;
   date: Date | null;
+  endDate?: Date | null;
+  durationMinutes?: number;
   hasTime: boolean;
   people: string[];
   link: string | null;
@@ -27,7 +29,17 @@ export function parseEvent(text: string, ref?: Date): EventData {
   let rest = ` ${collapse(text)} `;
 
   const date = findDate(rest, ref);
-  if (date) rest = removeRange(rest, date.index, date.text.length);
+  let durationMinutes: number | undefined;
+  if (date) {
+    rest = removeRange(rest, date.index, date.text.length);
+    if (date.end && date.start) {
+      const diff = Math.round((date.end.getTime() - date.start.getTime()) / (60 * 1000));
+      if (diff > 0) durationMinutes = diff;
+    }
+  }
+
+  // Strip residual date words or typos that might remain
+  rest = rest.replace(/\b(tomorrow|tommorow|tommorrow|tomorow|tmrw|today|yesterday|tonight)\b/gi, "");
 
   let link: string | null = null;
   const linkRe = /\s(?:on|over|via)\s+(google meet|gmeet|zoom|meet|teams|facetime|skype|discord|whatsapp)\b/i;
@@ -58,10 +70,18 @@ export function parseEvent(text: string, ref?: Date): EventData {
     rest = rest.slice(0, wm.index) + " " + wm[1].slice(segment.length);
   }
 
-  const title = capitalize(tidy(rest));
+  // Clean command prefixes like "create a task in the calendar to...", "add event to calendar:"
+  rest = rest.replace(/\b(?:create|add|schedule|set|put)?\s*(?:a\s+)?(?:task|event|meeting|reminder)\s+(?:in|on|to)\s+(?:the\s+)?calendar(?:\s*(?:to|for|about|:))?\s*/i, " ");
+  rest = rest.replace(/\b(?:calendar|agenda|schedule)\s*:\s*/i, " ");
+  rest = rest.replace(/\b(?:schedule|create|add)\s+(?:a\s+)?(?:task|event|meeting)\s+(?:to|for|about)?\s*/i, " ");
+
+  const rawTitle = capitalize(tidy(rest));
+  const title = rawTitle || (/\btask\b/i.test(text) ? "New Task" : "Untitled event");
   return {
     title,
     date: date?.start ?? null,
+    endDate: date?.end ?? null,
+    durationMinutes,
     hasTime: date?.hasTime ?? false,
     people,
     link,

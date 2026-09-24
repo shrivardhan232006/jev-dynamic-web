@@ -61,7 +61,13 @@ export type DateHit = {
 };
 
 export function findDate(text: string, ref: Date = new Date()): DateHit | null {
-  const results = chrono.parse(text, ref, { forwardDate: true });
+  // Normalize common date typos like tommorow, tmrw, tonite
+  const normalized = text
+    .replace(/\b(tommorow|tommorrow|tomorow|tmrw|tmr)\b/gi, "tomorrow")
+    .replace(/\b(tonite)\b/gi, "tonight")
+    .replace(/\b(yesturday|yesterdy)\b/gi, "yesterday");
+
+  const results = chrono.parse(normalized, ref, { forwardDate: true });
   if (!results.length) return null;
   const r = results[0];
   // chrono is happy to read a bare number as a date; require something date-like.

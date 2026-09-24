@@ -12,8 +12,10 @@ import {
   Coffee,
   Contact,
   Focus,
+  HardDrive,
   Link2,
   ListChecks,
+  Mail,
   Palette,
   Repeat,
   Ruler,
@@ -42,6 +44,7 @@ import { ContactCard } from "./ContactCard";
 import { ConvertCard } from "./ConvertCard";
 import { EventCard } from "./EventCard";
 import { ExpenseRow } from "./ExpenseRow";
+import { GmailCard } from "./GmailCard";
 import { HabitCard } from "./HabitCard";
 import { CATEGORY_ICON, TRANSPORT_ICON } from "./icons";
 import { LinkCard } from "./LinkCard";
@@ -205,11 +208,21 @@ export const registry: Registry = {
   },
   link: {
     label: "Bookmark",
-    example: "https://vercel.com/blog check later",
+    example: "drive machine learning notes",
     icon: Link2,
     signals: [],
-    summary: (d) => [d.domain ?? "Link", d.note].filter(Boolean).join(" · "),
+    headerIcon: (_, d) => (d.isDrive ? HardDrive : Link2),
+    headerLabel: (_, d) => (d.isDrive ? "Google Drive" : "Bookmark"),
+    summary: (d) => (d.isDrive ? `Drive: ${d.fileName || d.driveQuery || "Files"}` : [d.domain ?? "Link", d.note].filter(Boolean).join(" · ")),
     Component: LinkCard,
+  },
+  gmail: {
+    label: "Gmail",
+    example: "emails from Rahul about project",
+    icon: Mail,
+    signals: [],
+    summary: (d) => d.query ? `Mail: ${d.query}` : "Gmail",
+    Component: GmailCard,
   },
   countdown: {
     label: "Countdown",

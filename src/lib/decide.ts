@@ -84,6 +84,16 @@ export function rawState(result: IntentResult): UiState {
 export function decide(mem: DecideMemory, result: IntentResult, text: string): DecideMemory {
   if (!text.trim()) return initialMemory;
 
+  // Immediate deterministic detection for explicit drive search patterns
+  const isDriveQuery =
+    /^(?:drive|gdrive|onedrive)\s+/i.test(text.trim()) ||
+    /\s+(?:in|from|on)\s+(?:google\s+)?drive\b/i.test(text.trim()) ||
+    /drive\.google\.com/i.test(text);
+
+  if (isDriveQuery) {
+    return { ui: { kind: "committed", intent: "link" }, challenger: null, forcedText: null };
+  }
+
   const prev = mem.ui;
 
   // Forced intents stay until the text changes substantially.
